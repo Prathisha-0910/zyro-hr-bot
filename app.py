@@ -35,7 +35,7 @@ except Exception as e:
     st.error("Missing configuration values in Advanced Settings -> Secrets! Please check your keys.")
 
 # --- Rebuild Retriever From Saved Files ---
-embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 
 # Look directly in the main directory for index.faiss and index.pkl
 if os.path.exists("index.faiss"):

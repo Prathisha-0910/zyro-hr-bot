@@ -4,3 +4,4 @@ langchain-groq
 langchain-community
 faiss-cpu
 langchain-classic
+sentence-transformers

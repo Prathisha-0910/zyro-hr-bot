@@ -3,3 +3,4 @@ langchain
 langchain-groq
 langchain-community
 faiss-cpu
+langchain-classic

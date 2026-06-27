@@ -5,3 +5,5 @@ langchain-community
 faiss-cpu
 langchain-classic
 sentence-transformers
+torch
+torchvision

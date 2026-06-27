@@ -28,6 +28,18 @@ if "GROQ_API_KEY" in st.secrets:
     os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
     os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT", "zyro-rag-challenge")
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
+# --- Rebuild Retriever From Saved Files ---
+from langchain_community.vectorstores import FAISS
+from langchain_groq import GroqEmbeddings
+
+# Initialize the exact same embedding model used in your Kaggle notebook pipeline
+embeddings = GroqEmbeddings(model="llama-3.1-8b-instant") 
+
+if os.path.exists("faiss_index"):
+    vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+    retriever = vector_store.as_retriever(search_kwargs={"k": 3})
+else:
+    st.error("Vector database folder 'faiss_index' not found in repository! Please upload it to GitHub.")
 
 # --- 4. CONVERSATION HISTORY MEMORY INITIALIZATION ---
 if "messages" not in st.session_state:

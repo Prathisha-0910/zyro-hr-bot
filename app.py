@@ -25,10 +25,12 @@ with st.sidebar:
 # --- 3. ENVIRONMENT & SECRETS INGESTION ---
 if "GROQ_API_KEY" in st.secrets:
     os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+if "LANGCHAIN_API_KEY" in st.secrets:
     os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
-    os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT", "zyro-rag-challenge")
-    os.environ["LANGCHAIN_TRACING_V2"] = "true"
-# --- Rebuild Retriever From Saved Files ---
+if "LANGCHAIN_PROJECT" in st.secrets:
+    os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"]
+if "LANGCHAIN_TRACING_V2" in st.secrets:
+    os.environ["LANGCHAIN_TRACING_V2"] = st.secrets["LANGCHAIN_TRACING_V2"]
 # --- Rebuild Retriever From Saved Files ---
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings

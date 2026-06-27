@@ -29,12 +29,14 @@ if "GROQ_API_KEY" in st.secrets:
     os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT", "zyro-rag-challenge")
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # --- Rebuild Retriever From Saved Files ---
+# --- Rebuild Retriever From Saved Files ---
 from langchain_community.vectorstores import FAISS
-from langchain_groq import GroqEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
-# Initialize the exact same embedding model used in your Kaggle notebook pipeline
-embeddings = GroqEmbeddings(model="llama-3.1-8b-instant") 
+# Use an open-source local embedding model that requires no extra API key keys
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
+# Look directly in the main directory for index.faiss and index.pkl
 if os.path.exists("index.faiss"):
     vector_store = FAISS.load_local(".", embeddings, allow_dangerous_deserialization=True)
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})

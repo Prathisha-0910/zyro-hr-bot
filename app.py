@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import create_stuff_documents_chain, create_retrieval_chain
+from langchain_classic.chains import create_stuff_documents_chain, create_retrieval_chain
 
 # --- 1. PAGE SETUP & UI STYLE ---
 st.set_page_config(page_title="Zyro HR Compliance Assistant", page_icon="🏢", layout="wide")

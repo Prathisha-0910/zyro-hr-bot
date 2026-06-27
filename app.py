@@ -4,6 +4,8 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_classic.chains.retrieval import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # --- 1. PAGE SETUP & UI STYLE ---
 st.set_page_config(page_title="Zyro HR Compliance Assistant", page_icon="🏢", layout="wide")
@@ -23,19 +25,16 @@ with st.sidebar:
     st.info("💡 **System Rules Active:** Off-topic prompt guardrails are hardcoded to block non-HR queries automatically.")
 
 # --- 3. ENVIRONMENT & SECRETS INGESTION ---
-if "GROQ_API_KEY" in st.secrets:
+# Fetch keys globally from Streamlit Secrets to enforce availability
+try:
     os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
-if "LANGCHAIN_API_KEY" in st.secrets:
     os.environ["LANGCHAIN_API_KEY"] = st.secrets["LANGCHAIN_API_KEY"]
-if "LANGCHAIN_PROJECT" in st.secrets:
     os.environ["LANGCHAIN_PROJECT"] = st.secrets["LANGCHAIN_PROJECT"]
-if "LANGCHAIN_TRACING_V2" in st.secrets:
     os.environ["LANGCHAIN_TRACING_V2"] = st.secrets["LANGCHAIN_TRACING_V2"]
-# --- Rebuild Retriever From Saved Files ---
-from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+except Exception as e:
+    st.error("Missing configuration values in Advanced Settings -> Secrets! Please check your keys.")
 
-# Use an open-source local embedding model that requires no extra API key keys
+# --- Rebuild Retriever From Saved Files ---
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Look directly in the main directory for index.faiss and index.pkl
@@ -44,6 +43,7 @@ if os.path.exists("index.faiss"):
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 else:
     st.error("Vector database files not found in repository! Please upload index.faiss and index.pkl.")
+    st.stop() # Freeze app execution if database can't load
 
 # --- 4. CONVERSATION HISTORY MEMORY INITIALIZATION ---
 if "messages" not in st.session_state:
@@ -85,7 +85,6 @@ if user_query := st.chat_input("Ask about leave balances, allowances, or WFH gui
                 llm = ChatGroq(model=selected_model, temperature=temperature)
                 prompt = ChatPromptTemplate.from_messages([("system", system_prompt), ("human", "{input}")])
                 
-                # Using the retriever instance from the environment workspace
                 question_answer_chain = create_stuff_documents_chain(llm, prompt)
                 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
                 
@@ -112,4 +111,4 @@ if user_query := st.chat_input("Ask about leave balances, allowances, or WFH gui
                 })
                 
             except Exception as e:
-                st.error(f"Execution Error. Verify your API keys are correctly provided inside Advanced Settings -> Secrets. Details: {e}")
+                st.error(f"Execution Error. Details: {e}")

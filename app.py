@@ -111,4 +111,6 @@ if user_query := st.chat_input("Ask about leave balances, allowances, or WFH gui
                 })
                 
             except Exception as e:
-                st.error(f"Execution Error. Details: {e}")
+                import traceback
+                st.error("Execution Error Caught!")
+                st.code(traceback.format_exc())

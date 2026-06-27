@@ -35,11 +35,11 @@ from langchain_groq import GroqEmbeddings
 # Initialize the exact same embedding model used in your Kaggle notebook pipeline
 embeddings = GroqEmbeddings(model="llama-3.1-8b-instant") 
 
-if os.path.exists("faiss_index"):
-    vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+if os.path.exists("index.faiss"):
+    vector_store = FAISS.load_local(".", embeddings, allow_dangerous_deserialization=True)
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
 else:
-    st.error("Vector database folder 'faiss_index' not found in repository! Please upload it to GitHub.")
+    st.error("Vector database files not found in repository! Please upload index.faiss and index.pkl.")
 
 # --- 4. CONVERSATION HISTORY MEMORY INITIALIZATION ---
 if "messages" not in st.session_state:
